@@ -1,0 +1,267 @@
+import json
+from datetime import datetime
+
+# Definindo uma classe para representar um paciente
+class Paciente:
+    def __init__(self, nome, idade, diagnostico, historico_medico, sexo=None, rg_cpf=None, filiacao=None,
+                 escolaridade=None, comorbidades=None, antecedentes_pessoais=None, habitos_vicios=None,
+                 telefone=None, endereco=None, data_nascimento=None, alergia=None, doenca_cronica=None, 
+                 remedio_controlado=None, sintomas=None, tipo_sanguineo=None, contato_emergencia=None):
+        self.nome = nome
+        self.idade = idade
+        self.diagnostico = diagnostico
+        self.historico_medico = historico_medico
+        self.sexo = sexo
+        self.rg_cpf = rg_cpf
+        self.filiacao = filiacao
+        self.escolaridade = escolaridade
+        self.comorbidades = comorbidades
+        self.antecedentes_pessoais = antecedentes_pessoais
+        self.habitos_vicios = habitos_vicios
+        self.telefone = telefone
+        self.endereco = endereco
+        self.data_nascimento = data_nascimento
+        self.alergia = alergia
+        self.doenca_cronica = doenca_cronica
+        self.remedio_controlado = remedio_controlado
+        self.sintomas = sintomas
+        self.tipo_sanguineo = tipo_sanguineo
+        self.contato_emergencia = contato_emergencia
+
+    def mostrar_info(self):
+        return (f"Nome: {self.nome}\n"
+                f"Idade: {self.idade}\n"
+                f"Diagnóstico: {self.diagnostico}\n"
+                f"Histórico Médico: {self.historico_medico}\n"
+                f"Sexo: {self.sexo}\n"
+                f"RG/CPF: {self.rg_cpf}\n"
+                f"Filiação: {self.filiacao}\n"
+                f"Escolaridade: {self.escolaridade}\n"
+                f"Comorbidades: {self.comorbidades}\n"
+                f"Antecedentes Pessoais: {self.antecedentes_pessoais}\n"
+                f"Hábitos e Vícios: {self.habitos_vicios}\n"
+                f"Telefone: {self.telefone}\n"
+                f"Endereço: {self.endereco}\n"
+                f"Data de Nascimento: {self.data_nascimento}\n"
+                f"Alergia: {self.alergia}\n"
+                f"Doença Crônica: {self.doenca_cronica}\n"
+                f"Remédio Controlado: {self.remedio_controlado}\n"
+                f"Sintomas: {self.sintomas}\n"
+                f"Tipo Sanguíneo: {self.tipo_sanguineo}\n"
+                f"Contato de Emergência: {self.contato_emergencia}")
+
+    def to_dict(self):
+        return {
+            "nome": self.nome,
+            "idade": self.idade,
+            "diagnostico": self.diagnostico,
+            "historico_medico": self.historico_medico,
+            "sexo": self.sexo,
+            "rg_cpf": self.rg_cpf,
+            "filiacao": self.filiacao,
+            "escolaridade": self.escolaridade,
+            "comorbidades": self.comorbidades,
+            "antecedentes_pessoais": self.antecedentes_pessoais,
+            "habitos_vicios": self.habitos_vicios,
+            "telefone": self.telefone,
+            "endereco": self.endereco,
+            "data_nascimento": self.data_nascimento,
+            "alergia": self.alergia,
+            "doenca_cronica": self.doenca_cronica,
+            "remedio_controlado": self.remedio_controlado,
+            "sintomas": self.sintomas,
+            "tipo_sanguineo": self.tipo_sanguineo,
+            "contato_emergencia": self.contato_emergencia
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            nome=data["nome"],
+            idade=data["idade"],
+            diagnostico=data["diagnostico"],
+            historico_medico=data["historico_medico"],
+            sexo=data.get("sexo"),
+            rg_cpf=data.get("rg_cpf"),
+            filiacao=data.get("filiacao"),
+            escolaridade=data.get("escolaridade"),
+            comorbidades=data.get("comorbidades"),
+            antecedentes_pessoais=data.get("antecedentes_pessoais"),
+            habitos_vicios=data.get("habitos_vicios"),
+            telefone=data.get("telefone"),
+            endereco=data.get("endereco"),
+            data_nascimento=data.get("data_nascimento"),
+            alergia=data.get("alergia"),
+            doenca_cronica=data.get("doenca_cronica"),
+            remedio_controlado=data.get("remedio_controlado"),
+            sintomas=data.get("sintomas"),
+            tipo_sanguineo=data.get("tipo_sanguineo"),
+            contato_emergencia=data.get("contato_emergencia")
+        )
+
+# Função para exibir o menu
+def menu():
+    print("\n--- Menu Prontuário Médico ---")
+    print("1. Adicionar paciente")
+    print("2. Exibir prontuário")
+    print("3. Atualizar prontuário")
+    print("4. Listar todos os pacientes")
+    print("5. Salvar e sair")
+
+# Função para carregar pacientes de um arquivo JSON
+def carregar_pacientes():
+    try:
+        with open('pacientes.json', 'r') as f:
+            dados = json.load(f)
+            return {nome: Paciente.from_dict(info) for nome, info in dados.items()}
+    except FileNotFoundError:
+        return {}
+    except json.JSONDecodeError:
+        print("Erro ao ler o arquivo de dados. O arquivo pode estar corrompido.")
+        return {}
+
+# Função para salvar pacientes em um arquivo JSON
+def salvar_pacientes(pacientes):
+    dados = {nome: paciente.to_dict() for nome, paciente in pacientes.items()}
+    with open('pacientes.json', 'w') as f:
+        json.dump(dados, f, indent=4)
+    print("Dados salvos com sucesso!")
+
+# Função para validar a data de nascimento
+def validar_data_nascimento(data):
+    try:
+        datetime.strptime(data, "%d/%m/%Y")
+        return True
+    except ValueError:
+        return False
+
+# Função para validar a idade
+def validar_idade(idade):
+    return idade.isdigit() and int(idade) > 0
+
+# Função para atualizar informações de um paciente
+def atualizar_paciente(pacientes):
+    nome = input("Nome do paciente para atualizar: ")
+    paciente = pacientes.get(nome)
+    if paciente:
+        print("Atualize as informações do paciente (deixe em branco para não alterar):")
+        sexo = input(f"Sexo [{paciente.sexo}]: ") or paciente.sexo
+        rg_cpf = input(f"RG/CPF [{paciente.rg_cpf}]: ") or paciente.rg_cpf
+        filiacao = input(f"Filiação (nome do pai e da mãe ou responsável) [{paciente.filiacao}]: ") or paciente.filiacao
+        escolaridade = input(f"Escolaridade [{paciente.escolaridade}]: ") or paciente.escolaridade
+        comorbidades = input(f"Comorbidades [{paciente.comorbidades}]: ") or paciente.comorbidades
+        antecedentes_pessoais = input(f"Antecedentes Pessoais [{paciente.antecedentes_pessoais}]: ") or paciente.antecedentes_pessoais
+        habitos_vicios = input(f"Hábitos e Vícios [{paciente.habitos_vicios}]: ") or paciente.habitos_vicios
+        telefone = input(f"Telefone [{paciente.telefone}]: ") or paciente.telefone
+        endereco = input(f"Endereço [{paciente.endereco}]: ") or paciente.endereco
+        data_nascimento = input(f"Data de Nascimento (dd/mm/aaaa) [{paciente.data_nascimento}]: ") or paciente.data_nascimento
+        if data_nascimento and not validar_data_nascimento(data_nascimento):
+            print("Data de nascimento inválida! Use o formato dd/mm/aaaa.")
+            return
+        alergia = input(f"Alergia [{paciente.alergia}]: ") or paciente.alergia
+        doenca_cronica = input(f"Doença Crônica [{paciente.doenca_cronica}]: ") or paciente.doenca_cronica
+        remedio_controlado = input(f"Remédio Controlado [{paciente.remedio_controlado}]: ") or paciente.remedio_controlado
+        sintomas = input(f"Sintomas [{paciente.sintomas}]: ") or paciente.sintomas
+        tipo_sanguineo = input(f"Tipo Sanguíneo [{paciente.tipo_sanguineo}]: ") or paciente.tipo_sanguineo
+        contato_emergencia = input(f"Contato de Emergência [{paciente.contato_emergencia}]: ") or paciente.contato_emergencia
+
+        paciente.sexo = sexo
+        paciente.rg_cpf = rg_cpf
+        paciente.filiacao = filiacao
+        paciente.escolaridade = escolaridade
+        paciente.comorbidades = comorbidades
+        paciente.antecedentes_pessoais = antecedentes_pessoais
+        paciente.habitos_vicios = habitos_vicios
+        paciente.telefone = telefone
+        paciente.endereco = endereco
+        paciente.data_nascimento = data_nascimento
+        paciente.alergia = alergia
+        paciente.doenca_cronica = doenca_cronica
+        paciente.remedio_controlado = remedio_controlado
+        paciente.sintomas = sintomas
+        paciente.tipo_sanguineo = tipo_sanguineo
+        paciente.contato_emergencia = contato_emergencia
+
+        print(f"Informações do paciente {nome} atualizadas com sucesso!")
+    else:
+        print("Paciente não encontrado!")
+
+# Função para listar todos os pacientes
+def listar_pacientes(pacientes):
+    if not pacientes:
+        print("Nenhum paciente cadastrado.")
+    else:
+        print("\n--- Lista de Pacientes ---")
+        for paciente in pacientes.values():
+            print(f"\nPaciente: {paciente.nome}")
+            print(paciente.mostrar_info())
+
+# Função principal do programa
+def main():
+    pacientes = carregar_pacientes()
+
+    while True:
+        menu()
+        opcao = input("Escolha uma opção (1/2/3/4/5): ")
+
+        if opcao == '1':
+            nome = input("Nome do paciente: ")
+            idade = input("Idade do paciente: ")
+            if not validar_idade(idade):
+                print("Idade inválida! Por favor, insira um número positivo.")
+                continue
+            diagnostico = input("Diagnóstico: ")
+            historico_medico = input("Histórico Médico: ")
+            sexo = input("Sexo (feminino/masculino): ")
+            rg_cpf = input("RG/CPF: ")
+            filiacao = input("Filiação (nome do pai e da mãe ou responsável): ")
+            escolaridade = input("Escolaridade: ")
+            comorbidades = input("Comorbidades (opcional): ")
+            antecedentes_pessoais = input("Antecedentes Pessoais (opcional): ")
+            habitos_vicios = input("Hábitos e Vícios (opcional): ")
+            telefone = input("Telefone (opcional): ")
+            endereco = input("Endereço (opcional): ")
+            data_nascimento = input("Data de Nascimento (dd/mm/aaaa) (opcional): ")
+            if data_nascimento and not validar_data_nascimento(data_nascimento):
+                print("Data de nascimento inválida! Use o formato dd/mm/aaaa.")
+                continue
+            alergia = input("Alergia (opcional): ")
+            doenca_cronica = input("Doença Crônica (opcional): ")
+            remedio_controlado = input("Remédio Controlado (opcional): ")
+            sintomas = input("Sintomas (opcional): ")
+            tipo_sanguineo = input("Tipo Sanguíneo (opcional): ")
+            contato_emergencia = input("Contato de Emergência (opcional): ")
+
+            paciente = Paciente(
+                nome, idade, diagnostico, historico_medico, sexo, rg_cpf, filiacao, escolaridade, comorbidades, 
+                antecedentes_pessoais, habitos_vicios, telefone, endereco, data_nascimento, alergia, doenca_cronica,
+                remedio_controlado, sintomas, tipo_sanguineo, contato_emergencia
+            )
+            pacientes[nome] = paciente
+            print(f"Paciente {nome} adicionado com sucesso!")
+
+        elif opcao == '2':
+            nome = input("Nome do paciente para exibir o prontuário: ")
+            paciente = pacientes.get(nome)
+            if paciente:
+                print("\n--- Prontuário Médico ---")
+                print(paciente.mostrar_info())
+            else:
+                print("Paciente não encontrado!")
+
+        elif opcao == '3':
+            atualizar_paciente(pacientes)
+
+        elif opcao == '4':
+            listar_pacientes(pacientes)
+
+        elif opcao == '5':
+            salvar_pacientes(pacientes)
+            print("Saindo do programa...")
+            break
+
+        else:
+            print("Opção inválida! Por favor, escolha 1, 2, 3, 4 ou 5.")
+
+if __name__ == "__main__":
+    main()
